@@ -11,10 +11,10 @@ namespace ConsoleApp2
         public string Extension { get; set; } // тип
         public string Size { get; set; }       // размер
 
-        public File1(string name, string ex, string size)
+        public File1(string name, string extension, string size)
         {
             Name = name;
-            Extension = ex;
+            Extension = extension;
             Size = size;
         }
 
@@ -24,10 +24,9 @@ namespace ConsoleApp2
     class Movies : File1
     {
         public string Info { get; set; }
-        //    public string Length { get; set; }
 
-        public Movies(string name, string ex, string size, string info)
-    : base(name, ex, size)
+        public Movies(string name, string extension, string size, string info)
+    : base(name, extension, size)
         {
             Info = info;
         }
@@ -45,8 +44,8 @@ namespace ConsoleApp2
     {
         public string Resolution { get; set; }
 
-        public Images(string name, string ex, string size, string res)
-    : base(name, ex, size)
+        public Images(string name, string extension, string size, string res)
+    : base(name, extension, size)
         {
             Resolution = res;
         }
@@ -62,8 +61,8 @@ namespace ConsoleApp2
     {
         public string Content { get; set; }
 
-        public Text(string name, string ex, string size, string con)
-    : base(name, ex, size)
+        public Text(string name, string extension, string size, string con)
+    : base(name, extension, size)
         {
             Content = con;
         }
@@ -137,7 +136,7 @@ namespace ConsoleApp2
             if (fileInf.Exists)
             {
                 try
-                {             // Чтение айла
+                {             // Чтение файла
                               // Чтение всех строк файла в массив строк
                     allText = File.ReadAllLines(path);  
                     foreach (string s in allText)
@@ -152,7 +151,7 @@ namespace ConsoleApp2
             }
             Console.WriteLine();
 
-            List<File1> list = new List<File1>();
+            List<File1> list = new List<File1>(); // список всех объектов
 
             var sortedText = from stringText in allText
                              orderby stringText[0] descending
