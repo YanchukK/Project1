@@ -79,13 +79,10 @@ namespace ConsoleApp1
         public static List<Customer> FiltrByName(List<Customer> customers, string partOfName)
         {
             var FilteredCustomers = (from customer in customers
-                                     where customer.Name > Id
+                                     where customer.Name.ToLower().Contains(partOfName.ToLower())
                                      select customer).ToList();
             return FilteredCustomers;
         }
-
-
-
 
 
 
@@ -121,7 +118,6 @@ namespace ConsoleApp1
 
             var X = new DateTime(2018, 1, 1);
             var Y = new DateTime(2017, 12, 1);
-
             var ResultCustomers = FiltrRegistrationDate(customers, X, Y);
 
             foreach (var customer in ResultCustomers)
@@ -136,6 +132,13 @@ namespace ConsoleApp1
                 Console.WriteLine(customer.Id + " " + customer.Name); // проверка ид
             }
 
+
+
+            ResultCustomers = FiltrByName(customers, "aWan");
+            foreach (var customer in ResultCustomers)
+            {
+                Console.WriteLine(customer.Id + " " + customer.Name); // проверка имя
+            }
             Console.WriteLine();
         }
     }
