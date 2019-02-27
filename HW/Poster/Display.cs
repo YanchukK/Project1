@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
+using System.Threading;
+using System.Globalization;
 
 namespace Poster
 {
@@ -14,7 +16,7 @@ namespace Poster
             this.path = path;
         }
 
-        
+
         // Блок вывода на экран
 
         static void DisplayMovie(List<Movie> list)
@@ -56,9 +58,8 @@ namespace Poster
 
                 string format = "d MMM";
                 string form = "(ddd)";
-                Console.WriteLine(m.ToString(format).ToLower() + " "
-                    + m.ToString(form).ToUpper());
-                Console.WriteLine();
+                Console.WriteLine(m.ToString(format, CultureInfo.GetCultureInfo("ru-ru")).ToLower() + " "
+                    + m.ToString(form, CultureInfo.GetCultureInfo("ru-ru")).ToUpper());
                 DisplayMovie(d.Movies.Movie);
             }
         }
@@ -94,7 +95,7 @@ namespace Poster
             watcher.Changed += OnChanged;
 
             // tell the watcher where to look
-            watcher.Path = @"C:\Users\Dasha\source\repos\Poster\Poster\bin\Debug";
+            watcher.Path = @"C:\Users\student\source\repos\Poster\Poster\bin\Debug";
 
             // You must add this line - this allows events to fire.
             watcher.EnableRaisingEvents = true;
@@ -105,8 +106,11 @@ namespace Poster
         private void OnChanged(object sender, FileSystemEventArgs e)
         {
             // Обновляется экран
-                       
-            Console.WriteLine($"A new file has been changed - {e.Name}");
+            //Console.WriteLine("Sleep for 0,5 seconds.");
+            Thread.Sleep(200);
+
+            PosterDisplay();
+            UI.DisplayAvailableFeatures(path);
         }
     }
 }
