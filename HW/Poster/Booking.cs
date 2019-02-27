@@ -79,16 +79,13 @@ namespace Poster
         private bool IsMovieExist(int date, string movie)
         {
             var MovieList = GetMovies(date);
-            int i = 0;
-            foreach(var m in MovieList)
+            List<string> movies = new List<string>();
+            foreach (var m in MovieList)
             {
-                if(m.Name == movie)
-                {
-                    i++;
-                }
+                movies.Add(m.Name);
             }
-           
-            if(i == 1)
+
+            if (movies.Contains(movie))
             {
                 return true;
             }
@@ -139,23 +136,6 @@ namespace Poster
             }
         }
 
-        
-        private bool IsTicketAlreadyExist(int date, string movie, string session)
-        {
-            foreach(var h in tickets)
-            {
-                if (h.GetDate == date && 
-                    h.GetMovie == movie &&
-                    h.GetSession == session)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-
-
 
 
         private void BookTicket(int date, string movie, string session)
@@ -163,9 +143,9 @@ namespace Poster
             if (IsTicketAlreadyExist(date, movie, session))
             {
                 var ticket = (from t in tickets
-                           where t.GetDate == date &&
-                           t.GetMovie == movie && t.GetSession == session
-                           select t).FirstOrDefault();
+                              where t.GetDate == date &&
+                              t.GetMovie == movie && t.GetSession == session
+                              select t).FirstOrDefault();
 
                 int index = tickets.IndexOf(ticket);
                 tickets[index].Count += 1;
@@ -177,9 +157,26 @@ namespace Poster
         }
 
 
+        private bool IsTicketAlreadyExist(int date, string movie, string session)
+        {
+            foreach (var h in tickets)
+            {
+                if (h.GetDate == date &&
+                    h.GetMovie == movie &&
+                    h.GetSession == session)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         public void BookingTicket()
         {
             Console.Write("Введите число: ");
+            //string strdate = Console.ReadLine();
+
             int date = int.Parse(Console.ReadLine());
 
             while (!IsDateExist(date))
@@ -187,11 +184,6 @@ namespace Poster
                 Console.Write("Такой даты нету. Трай эгейн: ");
                 int.TryParse(Console.ReadLine(), out date);
             }
-
-
-
-
-
 
             Console.Write("Введите название фильма: ");
             string movie = Console.ReadLine();
@@ -239,6 +231,7 @@ namespace Poster
             if (tickets.Count == 0)
             {
                 Console.WriteLine("Пока никто ничего не забронировал");
+                Console.WriteLine();
             }
             else
             {
@@ -260,13 +253,14 @@ namespace Poster
                 i++;
             }
         }
-        
+
         // Реализовать возможность отменить бронь
         public void CancelBooking()
         {
             if (tickets.Count == 0)
             {
                 Console.WriteLine("Пока никто ничего не забронировал");
+                Console.WriteLine();
             }
             else
             {
@@ -274,7 +268,7 @@ namespace Poster
                 Console.Write("Введите номер вашего заказа: ");
                 int ordernumber = 0;
 
-                while(!int.TryParse(Console.ReadLine(), out ordernumber))
+                while (!int.TryParse(Console.ReadLine(), out ordernumber))
                 {
                     Console.WriteLine("Такого номера не существует");
                     Console.Write("Попробуйсте еще раз: ");
@@ -284,7 +278,7 @@ namespace Poster
                 {
                     Console.WriteLine("Такого номера не существует");
                 }
-                else if(tickets[ordernumber - 1].Count == 1)
+                else if (tickets[ordernumber - 1].Count == 1)
                 {
                     tickets.RemoveAt(ordernumber - 1);
 
