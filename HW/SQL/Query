@@ -1,0 +1,74 @@
+CREATE DATABASE VCPhoneBook;
+
+CREATE TABLE dbo.[User]
+(
+    Id int not null identity(1,1),
+	Name nvarchar(50),
+	Phone nvarchar(50),
+	City nvarchar(50)
+)
+
+ALTER TABLE dbo.[User]
+ADD Age int not null;
+
+ALTER TABLE dbo.[User]
+ADD PRIMARY KEY (Id)
+
+CREATE TABLE dbo.[Manager]
+(
+    Id int not null identity(1,1),
+	Name nvarchar(50),
+	Phone nvarchar(50),
+	PRIMARY KEY CLUSTERED
+	(
+        [Id] ASC	
+	)
+)
+
+ALTER TABLE dbo.[User]
+ADD ManagerId int;
+
+ALTER TABLE dbo.[User]
+ADD CONSTRAINT FK_User_Manager
+FOREIGN KEY (ManagerId) REFERENCES dbo.[Manager](Id);
+
+
+INSERT dbo.[Manager]
+(Name, Phone)
+VALUES
+('Jim', '050'),
+('Amy', '051')
+
+SELECT * FROM dbo.Manager
+
+INSERT dbo.[User]
+(Name, Phone, City, Age, ManagerId)
+VALUES
+('Jhon', '066', 'Kh', 26, 1),
+('Lucas', '067', 'Kyiv', 32, 2),
+('Peter', '068', 'Kh', 22, 1),
+('Ella', '069', 'Kh', 35, 1),
+('Michael', '070', 'Kyiv', 41, 2)
+
+UPDATE dbo.[User]
+SET Phone = '095'
+WHERE Name = 'Peter'
+
+SELECT * FROM dbo.[User]
+
+SELECT * FROM dbo.[User]
+WHERE Name = 'Peter'
+
+SELECT MAX(Age), City FROM dbo.[User]
+--WHERE Age > 25 AND City = 'Kyiv'
+--ORDER BY Age DESC
+GROUP BY City
+--HAVING COUNT(*) > 2
+
+
+
+
+SELECT u.Id, u.Name, m.Name as manager
+FROM dbo.[User] u
+JOIN dbo.[Manager] m ON u.ManagerId = m.Id
+WHERE m.Name = 'Jim'
