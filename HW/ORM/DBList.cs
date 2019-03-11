@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.Common;
+using System.Reflection;
 
 namespace ConsoleAppWithDB
 {
@@ -29,13 +27,26 @@ namespace ConsoleAppWithDB
 
         public T Insert(T t)
         {
+            string sql = $"SELECT * FROM [dbo].[{this.dataType.Name}]";
             using (var connection = new SqlConnection(this.ConnectionString))
             {
-                string cndText = $"insert * from [dbo].[{this.dataType.Name}] ()";
-                SqlCommand sqlCommand = new SqlCommand(cndText, connection);
-
                 connection.Open();
-                sqlCommand.ExecuteNonQuery();
+                SqlDataAdapter adapter = new SqlDataAdapter(sql, connection);
+                DataSet ds = new DataSet();
+                adapter.Fill(ds);
+
+                DataTable dt = ds.Tables[0];
+
+                DataRow row = dt.NewRow();
+                foreach (var prop in this.dataType.GetProperties())
+                    row[prop.Name] = prop.GetValue(t) ?? DBNull.Value;
+
+                dt.Rows.Add(row);
+
+                SqlCommandBuilder commandBuilder = new SqlCommandBuilder(adapter);
+                adapter.Update(ds);
+                ds.Clear();
+                adapter.Fill(ds);
             }
 
             return default(T);
@@ -54,6 +65,7 @@ namespace ConsoleAppWithDB
 
             return this.data.First(e => e.Id == id);
         }
+         
 
         public IEnumerable<T> GetAll()
         {
@@ -63,28 +75,42 @@ namespace ConsoleAppWithDB
                 SqlCommand sqlCommand = new SqlCommand(cndText, connection);
                 connection.Open();
 
-                using (SqlDataReader reader = sqlCommand.ExecuteReader())
+                SqlDataAdapter adapter = new SqlDataAdapter(sqlCommand);
+
+                DataSet ds = new DataSet();
+
+                adapter.Fill(ds);
+
+                foreach (DataTable dt in ds.Tables)
                 {
-                    if (reader.HasRows)
+                    foreach (DataRow row in dt.Rows)
                     {
-                        while (reader.Read())
-                        {
-                            T t = Activator.CreateInstance<T>();
-
-                            foreach(var prop in this.dataType.GetProperties())
-                            {
-                                prop.SetValue(t, reader[prop.Name]);
-                            }
-
-                            this.data.Add(t);
-
-                        }
+                        T item = GetItem<T>(row);
+                        data.Add(item);
                     }
                 }
             }
 
             return this.data;
         }
+
+        private static T GetItem<T>(DataRow dr)
+        {
+            Type temp = typeof(T);
+            T t = Activator.CreateInstance<T>();
+            foreach (DataColumn column in dr.Table.Columns)
+            {
+                foreach (PropertyInfo prop in temp.GetProperties())
+                {
+                    if (prop.Name == column.ColumnName)
+                        prop.SetValue(t, dr[column.ColumnName], null);
+                    else
+                        continue;
+                }
+            }
+            return t;
+        }
+
 
         public T Update(T t)
         {
@@ -93,7 +119,22 @@ namespace ConsoleAppWithDB
 
         public bool Delete(T t)
         {
-            return true;
+            if (GetAll().Count() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                using (var connection = new SqlConnection(this.ConnectionString))
+                {
+                    string cndText = $"DELETE FROM [dbo].[{this.dataType.Name}] WHERE id = {t.Id}";
+                    SqlCommand sqlCommand = new SqlCommand(cndText, connection);
+
+                    connection.Open();
+                    sqlCommand.ExecuteNonQuery();
+                }
+                return true;
+            }
         }
     }
 }
