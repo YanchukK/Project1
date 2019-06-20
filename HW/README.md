@@ -1,4 +1,1 @@
-- http://www.entityframeworktutorial.net/code-first/code-based-migration-in-code-first.aspx
-- https://docs.microsoft.com/ru-ru/ef/ef6/modeling/code-first/migrations/
-- https://docs.microsoft.com/ru-ru/ef/core/miscellaneous/configuring-dbcontext
-- http://www.entityframeworktutorial.net/code-first/database-initialization-in-code-first.aspx
+
